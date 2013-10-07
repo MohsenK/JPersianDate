@@ -169,7 +169,11 @@ public class PersianDateTime {
         return this.getTimeStamp() < dt.getTimeStamp();
     }
 
-    public DateTime toGregorianDate(PersianDateTime pd) {
+    public DateTime toGregorianDate() {
+        return toGregorianDate(this);
+    }
+
+    public static DateTime toGregorianDate(PersianDateTime pd) {
         DateTime dt = null;
         int miladiYear, i, dayCount, remainDay, marchDayDiff;
         // this buffer has day count of Miladi month from April to January for a none year.
