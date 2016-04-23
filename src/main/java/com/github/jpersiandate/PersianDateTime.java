@@ -3,9 +3,8 @@
  * and open the template in the editor.
  */
 package com.github.jpersiandate;
-
 import java.util.Calendar;
-import org.joda.time.DateTime;
+import java.util.GregorianCalendar;
 
 public class PersianDateTime {
 
@@ -45,13 +44,13 @@ public class PersianDateTime {
         this.second = second;
     }
 
-    public static PersianDateTime valueOf(DateTime ed) {
+    public static PersianDateTime valueOf(Calendar ed) {
         int g_days_in_month[] = new int[]{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
         int j_days_in_month[] = new int[]{31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29};
         int i;
-        int gy = ed.getYear() - 1600;
-        int gm = ed.getMonthOfYear() - 1;
-        int gd = ed.getDayOfMonth() - 1;
+        int gy = ed.get(Calendar.YEAR) - 1600;
+        int gm = ed.get(Calendar.MONTH) - 1;
+        int gd = ed.get(Calendar.DAY_OF_MONTH) - 1;
         int g_day_no = 365 * gy + (int) ((gy + 3) / 4) - (int) ((gy + 99) / 100) + ((int) ((gy + 399) / 400));
         for (i = 0; i < gm; ++i) {
             g_day_no += g_days_in_month[i];
@@ -75,12 +74,13 @@ public class PersianDateTime {
         int jm = i + 1;
         j_day_no++;
 
-        return new PersianDateTime(jy, jm, j_day_no, ed.getHourOfDay(), ed.getMinuteOfHour(), ed.getSecondOfMinute());
+        return new PersianDateTime(jy, jm, j_day_no, ed.get(Calendar.HOUR_OF_DAY), ed.get(Calendar.MINUTE), ed.get(Calendar.SECOND));
 
     }
 
     public static PersianDateTime valueOf(Long milis) {
-        org.joda.time.DateTime dt = new org.joda.time.DateTime(milis);
+        Calendar dt = new GregorianCalendar();
+        dt.setTimeInMillis(milis);
         return PersianDateTime.valueOf(dt);
     }
 
@@ -92,12 +92,12 @@ public class PersianDateTime {
         int second = cal.get(Calendar.SECOND);
         int hour = cal.get(Calendar.HOUR_OF_DAY);
         int minute = cal.get(Calendar.MINUTE);
-        return PersianDateTime.valueOf(new DateTime(year, month, day, hour, minute, second));
+        return PersianDateTime.valueOf(new GregorianCalendar(year, month, day, hour, minute, second));
     }
 
     public long getTimeStamp() {
-        DateTime dt = new DateTime(year, month, day, hour, minute, second);
-        return dt.getMillis();
+        GregorianCalendar dt = new GregorianCalendar(year, month, day, hour, minute, second);
+        return dt.getTimeInMillis();
     }
 
     public int getDay() {
@@ -169,12 +169,12 @@ public class PersianDateTime {
         return this.getTimeStamp() < dt.getTimeStamp();
     }
 
-    public DateTime toGregorianDate() {
+    public GregorianCalendar toGregorianDate() {
         return toGregorianDate(this);
     }
 
-    public static DateTime toGregorianDate(PersianDateTime pd) {
-        DateTime dt = null;
+    public static GregorianCalendar toGregorianDate(PersianDateTime pd) {
+        GregorianCalendar dt = null;
         int miladiYear, i, dayCount, remainDay, marchDayDiff;
         // this buffer has day count of Miladi month from April to January for a none year.
         int[] miladiMonth = {30, 31, 30, 31, 31, 30, 31, 30, 31, 31, 28, 31};
@@ -201,7 +201,7 @@ public class PersianDateTime {
         //Finding the correspond miladi month and day
         if (dayCount <= marchDayDiff) //So we are in 20(for leap year) or 21for none leap year) to 31 march
         {
-            dt = new DateTime(miladiYear, 3, dayCount + (31 - marchDayDiff), pd.hour, pd.minute, pd.second);
+            dt = new GregorianCalendar(miladiYear, 3, dayCount + (31 - marchDayDiff), pd.hour, pd.minute, pd.second);
         } else {
             remainDay = dayCount - marchDayDiff;
             i = 0; //starting from April
@@ -212,9 +212,9 @@ public class PersianDateTime {
             //  miladiDate.setDate(remainDay);
             if (i > 8) // We are in the next Miladi Year
             {
-                dt = new DateTime(miladiYear + 1, i - 8, remainDay, pd.hour, pd.minute, pd.second);
+                dt = new GregorianCalendar(miladiYear + 1, i - 8, remainDay, pd.hour, pd.minute, pd.second);
             } else {
-                dt = new DateTime(miladiYear, i + 4, remainDay, pd.hour, pd.minute, pd.second);
+                dt = new GregorianCalendar(miladiYear, i + 4, remainDay, pd.hour, pd.minute, pd.second);
             }
         }
         return dt;
